@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">polygons</string>
+    <string name="app_name">maps</string>
     <string name="title_activity_maps">Map</string>
+    <string name="Location_Preferences">Location_Pref</string>
 </resources>
