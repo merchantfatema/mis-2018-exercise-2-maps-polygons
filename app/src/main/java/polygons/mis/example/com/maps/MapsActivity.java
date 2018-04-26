@@ -165,9 +165,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             polygon =  mMap.addPolygon(vertices);
             Double polygonArea = computeAreaofPolygon(markerLocations);
+            String areaUnit;
+            if( polygonArea > 1000 ){
+                polygonArea = polygonArea/1000;
+                areaUnit = String.format("%.2f",polygonArea)  + "km\u00B2" ;
+            }
+            else{
+                areaUnit = String.format("%.2f",polygonArea)  + "m\u00B2" ;
+            }
             LatLng centroid = computeCentroid(markerLocations);
             areaMarker = showMarker( new MarkerDetail("Area of Polygon is: "
-                                            + String.format("%.2f",polygonArea) + "m\u00B2" ,
+                                            + areaUnit,
                     String.valueOf(centroid.latitude),
                     String.valueOf(centroid.longitude)) , mMap, BitmapDescriptorFactory.HUE_ORANGE);
             return true;
