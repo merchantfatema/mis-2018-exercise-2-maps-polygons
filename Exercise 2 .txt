@@ -1,0 +1,21 @@
+/*
+ * Name: Exercise 2
+ * Created Date: 19 April, 2018
+ * Purpose: Maps & Polygons
+ * Student Name: Fatema Merchant
+ * Student Id: 119431
+ * */
+
+References:
+
+https://documentation.beemray.com/section/request-location-permission-android-6/
+
+https://developerlife.com/2010/10/20/gps/
+
+https://stackoverflow.com/questions/19396295/android-calculate-the-area-of-polygon
+
+Area of Polygon: http://www.independent-software.com/gmap-net-tutorial-calculating-the-area-of-a-polygon-on-the-map/
+
+Centroid of Polygon: https://math.stackexchange.com/questions/90463/how-can-i-calculate-the-centroid-of-polygon/699413#699413
+
+
