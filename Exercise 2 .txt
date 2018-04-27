@@ -5,6 +5,16 @@
  * Student Name: Fatema Merchant
  * Student Id: 119431
  * */
+ 
+ /*
+The class contains the following functionality:
+1. To add custom message to each marker
+2. To add markers to map via LongPress on the screen
+3. To create a polygon via click on Start Polygon Button
+4. To remove a polygon via click on Remove Polygon Button
+5. To calculate area of polygon and show it as a marker on the center of polygon
+6. To remove all markers from Map
+ */
 
 References:
 
