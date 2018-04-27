@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -112,6 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     markerMessage.setText("");
                     //Saving Markerps on Map
                     saveMarkers(message,latLng);
+                    hideInputKeyboard();
                 }
             }//End of onMapLongClick
 
@@ -314,6 +316,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .position(location)
                                     .title(marker.message)
                                     .snippet(marker.message)
+                                    .flat(true)
                                     .icon(BitmapDescriptorFactory.defaultMarker(hue)));
         return mapMarker;
     }
@@ -405,6 +408,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         else{
             showToastMessage("There are no markers present on map except for current location. Current Location can not be removed!!!");
+        }
+    }
+    public void hideInputKeyboard(){
+        View view = getWindow().getDecorView();
+        if (view != null) {
+            InputMethodManager iMManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            iMManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 }
