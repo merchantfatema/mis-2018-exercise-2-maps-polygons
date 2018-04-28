@@ -70,6 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker areaMarker;
     Integer markerCount;
     static public final int REQUEST_LOCATION = 1;
+    Button polygonBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,10 +107,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     showToastMessage("Please enter a custom message!!!");
                 } else {
                     showMarker(new MarkerDetail( message,
-                                                 String.valueOf(latLng.latitude),
-                                                 String.valueOf(latLng.longitude)),
-                                mMap,
-                                BitmapDescriptorFactory.HUE_RED);
+                                    String.valueOf(latLng.latitude),
+                                    String.valueOf(latLng.longitude)),
+                            mMap,
+                            BitmapDescriptorFactory.HUE_RED);
                     markerMessage.setText("");
                     //Saving Markerps on Map
                     saveMarkers(message,latLng);
@@ -124,7 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     */
     public void processPolygon(View view){
 
-        Button polygonBtn = findViewById(R.id.polygonBtn);
+        polygonBtn = findViewById(R.id.polygonBtn);
         if(polygonBtn.getText().equals("Start Polygon")){
 
             Boolean successfullExecution = createPolygon();
@@ -150,8 +151,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayList<MarkerDetail> markerDetailArray = getMarkersFromSharedPref( );
         if (markerDetailArray != null) {
             for (MarkerDetail marker : markerDetailArray) {
+                Log.d("Marker Name:?????" , marker.message);
                 markerLocations.add(new LatLng( Double.valueOf(marker.latitude),
-                                                Double.valueOf(marker.longitude)));
+                        Double.valueOf(marker.longitude)));
             }
         }
 
@@ -160,10 +162,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             latLngArray = markerLocations.toArray(latLngArray);
 
             PolygonOptions vertices = new PolygonOptions()
-                                     .add(latLngArray)
-                                     .strokeWidth(10)
-                                     .strokeColor(Color.argb(255,235,139,38))
-                                     .fillColor(Color.argb(100,255,181,102));
+                    .add(latLngArray)
+                    .strokeWidth(10)
+                    .strokeColor(Color.argb(255,235,139,38))
+                    .fillColor(Color.argb(100,255,181,102));
 
             polygon =  mMap.addPolygon(vertices);
             Double polygonArea = computeAreaofPolygon(markerLocations);
@@ -177,7 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             LatLng centroid = computeCentroid(markerLocations);
             areaMarker = showMarker( new MarkerDetail("Area of Polygon is: "
-                                            + areaUnit,
+                    + areaUnit,
                     String.valueOf(centroid.latitude),
                     String.valueOf(centroid.longitude)) , mMap, BitmapDescriptorFactory.HUE_ORANGE);
             return true;
@@ -238,7 +240,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        mapFragment.setRetainInstance(true);
         checkLocationPermission();
     }
 
@@ -262,9 +264,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LocationManager mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 &&  ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             return new LatLng(50.979492,11.323544);
         }
@@ -273,10 +275,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mLocationManager.getProvider(mLocationManager.getBestProvider( createFineCriteria(),true ));
 
             Location currentLocation = mLocationManager.getLastKnownLocation(high.getName());
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            mMap.getUiSettings().setZoomControlsEnabled(true);
-            return new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            if( currentLocation != null){
+                mMap.setMyLocationEnabled(true);
+                mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+                return new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            }
+            else{
+                return new LatLng(50.979492,11.323544);
+            }
         }
     }
 
@@ -313,11 +320,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng location = new LatLng(Double.parseDouble(marker.latitude), Double.parseDouble(marker.longitude));
         Marker mapMarker;
         mapMarker = mMap.addMarker(new MarkerOptions() //new MarkerOptions()
-                                    .position(location)
-                                    .title(marker.message)
-                                    .snippet(marker.message)
-                                    .flat(true)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(hue)));
+                .position(location)
+                .title(marker.message)
+                .snippet(marker.message)
+                //.flat(true)
+                .icon(BitmapDescriptorFactory.defaultMarker(hue)));
         return mapMarker;
     }
 
@@ -337,7 +344,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         String latitude = String.valueOf(latLng.latitude);
         String longitude = String.valueOf(latLng.longitude);
-        Set<String> markerDetailSet = new HashSet<String>();
+        Set<String> markerDetailSet = new HashSet<>();
 
         markerDetailSet.add("Message:" + message);
         markerDetailSet.add("Latitude:" + latitude);
@@ -365,8 +372,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Map.Entry key;
         Set<String> markerStringSet;
         Iterator<String> markerSetIt;
-        while (it.hasNext()) {
+        for(int count = 0; count < existingMarker.size(); count++){
+            markerStringSet = sharedPrefMarkers.getStringSet(String.valueOf(count),null);
+            if(!markerStringSet.equals(null)){
+                markerSetIt = markerStringSet.iterator();
+                String message = "", latitude = "", longitude = "";
+                marker = new MarkerDetail();
+                while(markerSetIt.hasNext()){
+
+                    String markerDetail = markerSetIt.next();
+                    String[] detailsArray = markerDetail.split(":", 2);
+
+                    if( detailsArray[0].equals("Message") ){
+                        marker.message = detailsArray[1];
+                    }
+                    else if( detailsArray[0].equals("Latitude") ){
+                        marker.latitude = detailsArray[1];
+                    }
+                    else if( detailsArray[0].equals("Longitude") ){
+                        marker.longitude = detailsArray[1];
+                    }
+                }
+                markerDetailArray.add( marker );
+            }
+        }
+        /*while (it.hasNext()) {
             key = (Map.Entry) it.next();
+            Log.d("Key:", String.valueOf(key));
             markerStringSet = (Set<String>) key.getValue();
             markerSetIt = markerStringSet.iterator();
             String message = "", latitude = "", longitude = "";
@@ -387,7 +419,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
             markerDetailArray.add( marker );
-        }
+        }*/
         return markerDetailArray;
     }
     @Override
@@ -405,6 +437,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             configureCurrentLocation();
             editor.clear();
             editor.commit();
+            if(polygonBtn.getText().equals("End Polygon")){
+                polygonBtn.setText("Start Polygon");
+            }
         }
         else{
             showToastMessage("There are no markers present on map except for current location. Current Location can not be removed!!!");
@@ -418,16 +453,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 }
-    class MarkerDetail{
+class MarkerDetail{
 
-        String message;
-        String latitude;
-        String longitude;
-        public MarkerDetail(){}
-        public MarkerDetail( String message, String latitude, String longitude){
-            this.message = message;
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
+    String message;
+    String latitude;
+    String longitude;
+    public MarkerDetail(){}
+    public MarkerDetail( String message, String latitude, String longitude){
+        this.message = message;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
+}
 
